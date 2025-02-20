@@ -124,4 +124,41 @@ public class InvoiceTest {
     public void testAddingNullProduct() {
         invoice.addProduct(null);
     }
+
+    @Test
+    public void testProductIsAddedToInvoice() {
+        Product cheese = new DairyProduct("Ser", new BigDecimal("15.99"));
+        invoice.addProduct(cheese);
+
+        Assert.assertThat(invoice.getNetPrice(), Matchers.comparesEqualTo(new BigDecimal("15.99")));
+    }
+    @Test
+    public void testAddingSameProductMultipleTimes() {
+        Product yogurt = new DairyProduct("Jogurt", new BigDecimal("5"));
+
+        invoice.addProduct(yogurt);
+        invoice.addProduct(yogurt, 2);
+
+        Assert.assertThat(invoice.getNetPrice(), Matchers.comparesEqualTo(new BigDecimal("15")));
+    }
+
+    @Test
+    public void testInvoiceWithLargeQuantities() {
+        Product goldBar = new OtherProduct("Sztabka", new BigDecimal("50000"));
+
+        invoice.addProduct(goldBar, 1000000); // 1 000 000 sztuk
+
+        Assert.assertThat(invoice.getNetPrice(), Matchers.comparesEqualTo(new BigDecimal("50000000000")));
+    }
+
+    @Test
+    public void testInvoiceWithZeroPriceProduct() {
+        Product freeSample = new TaxFreeProduct("Gratis", BigDecimal.ZERO);
+        invoice.addProduct(freeSample, 5);
+        Assert.assertThat(invoice.getNetPrice(), Matchers.comparesEqualTo(BigDecimal.ZERO));
+        Assert.assertThat(invoice.getGrossPrice(), Matchers.comparesEqualTo(BigDecimal.ZERO));
+    }
+
+
 }
+

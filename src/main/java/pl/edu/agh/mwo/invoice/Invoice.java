@@ -9,32 +9,40 @@ import java.util.Map;
 import pl.edu.agh.mwo.invoice.product.Product;
 
 public class Invoice {
-    private Map<Product, Integer> productIndex= new HashMap<>();
+    private Map<Product, Integer> products= new HashMap<>();
 
 
     public void addProduct(Product product) {
-        this.products.add(product);
+        addProduct(product,1);
     }
 
     public void addProduct(Product product, Integer quantity) {
-        for(int i=0; i < quantity; i++) {
-            addProduct(product);
+        if (product == null || quantity==null ||quantity <=0){
+            throw new IllegalArgumentException("Produkt nie może być null i ilość musi być większa od zera.");
         }
+        products.merge(product, quantity, Integer::sum);
     }
 
     public BigDecimal getNetPrice() {
         BigDecimal sum = BigDecimal.ZERO;
-        for (Product product : products) {
-            sum = sum.add(product.getPrice());
+        for (Map.Entry<Product, Integer> entry : products.entrySet()) {
+            sum = sum.add(entry.getKey().getPrice().multiply(BigDecimal.valueOf(entry.getValue())));
         }
         return sum;
     }
 
     public BigDecimal getTax() {
-        return BigDecimal.ZERO;
+        BigDecimal totalTax = BigDecimal.ZERO;
+        for (Map.Entry<Product, Integer> entry : products.entrySet()) {
+            BigDecimal taxAmount = entry.getKey().getPrice()
+                    .multiply(entry.getKey().getTaxPercent())
+                    .multiply(BigDecimal.valueOf(entry.getValue()));
+            totalTax = totalTax.add(taxAmount);
+        }
+        return totalTax;
     }
 
     public BigDecimal getGrossPrice() {
-        return BigDecimal.ZERO;
+        return getNetPrice().add(getTax());
     }
 }

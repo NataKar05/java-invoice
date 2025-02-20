@@ -10,8 +10,9 @@ public abstract class Product {
     private final BigDecimal taxPercent;
 
     protected Product(String name, BigDecimal price, BigDecimal tax) {
-        if(name==null || name.isEmpty()) {
-            throw new IllegalArgumentException("Product name cannot be null or empty");
+        if (name == null || name.equals("") || price == null || tax == null || tax.compareTo(new BigDecimal(0)) < 0
+                || price.compareTo(new BigDecimal(0)) < 0) {
+            throw new IllegalArgumentException();
         }
         //name== porownanie porownuje referencje
         //new Integer(2)==new Integer==(2) - wyjdzie false, bo porownujemy czy ten obiekt jest ten sam a nie czy ich wartosc jest taka sama
@@ -20,10 +21,6 @@ public abstract class Product {
 
         //zeby cena nie byla null
         //zeby cena nie byla ujemna
-        if (price == null || price.compareTo(BigDecimal.ZERO)<0) {
-            throw new IllegalArgumentException("Product price cannot be null or negative");
-        }
-
         this.name = name;
         this.price = price;
         this.taxPercent = tax;
